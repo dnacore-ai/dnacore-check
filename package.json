@@ -1,0 +1,21 @@
+{
+  "name": "dnacore-check",
+  "version": "0.2.0",
+  "description": "Check your site's AI-readiness: validates llms.txt, agents.json, robots.txt and scores AI discoverability.",
+  "main": "index.js",
+  "bin": {
+    "dnacore-check": "./index.js"
+  },
+  "keywords": ["llms-txt", "agents-json", "ai-web", "ai-readiness", "dnacore", "open-protocol", "mcp"],
+  "author": "dnacore-ai",
+  "license": "MIT",
+  "homepage": "https://dnacore.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dnacore-ai/dnacore-check.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

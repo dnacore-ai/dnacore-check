@@ -3,6 +3,7 @@
 const { checkLlmsTxt } = require('./lib/checks/llms-txt');
 const { checkAgentsJson } = require('./lib/checks/agents-json');
 const { checkRobotsTxt } = require('./lib/checks/robots-txt');
+const { checkJsonLd } = require('./lib/checks/json-ld');
 const { report } = require('./lib/reporter');
 const readline = require('readline');
 const https = require('https');
@@ -45,10 +46,19 @@ async function submit(url, score) {
 async function main() {
   let url = process.argv[2];
 
-  if (!url) {
-    console.log('用法：npx dnacore-check <url>');
-    console.log('範例：npx dnacore-check https://yourdomain.com');
-    process.exit(1);
+  if (!url || url === '--help' || url === '-h') {
+    console.log('');
+    console.log('  dnacore-check — AI-Readiness Checker');
+    console.log('');
+    console.log('  Usage:   npx dnacore-check <url>');
+    console.log('  Example: npx dnacore-check https://example.com');
+    console.log('');
+    console.log('  Checks: llms.txt (25pts) · agents.json (25pts) · robots.txt (35pts) · JSON-LD (15pts)');
+    console.log('  Score:  A+ (≥90) · A (≥80) · B+ (≥70) · B (≥60) · C (≥50) · D (<50)');
+    console.log('');
+    console.log('  After scoring, submit your site to the DNACORE AI directory: https://dnacore.ai');
+    console.log('');
+    process.exit(url ? 0 : 1);
   }
 
   if (!url.startsWith('http')) url = 'https://' + url;
@@ -64,13 +74,21 @@ async function main() {
 
   console.log(`\n  掃描中：${url} ...\n`);
 
-  const [llms, agents, robots] = await Promise.all([
+  const [llms, agents, robots, jsonld] = await Promise.all([
     checkLlmsTxt(url),
     checkAgentsJson(url),
-    checkRobotsTxt(url)
+    checkRobotsTxt(url),
+    checkJsonLd(url)
   ]);
 
-  const score = report(url, { llms, agents, robots });
+  const score = report(url, { llms, agents, robots, jsonld });
+
+  // 非互動環境（CI/CD、管道）直接結束
+  if (!process.stdin.isTTY) {
+    console.log('');
+    process.exit(0);
+    return;
+  }
 
   // 詢問是否提交到 DNACORE
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -80,6 +98,7 @@ async function main() {
       await submit(url, score);
     }
     console.log('');
+    process.exit(0);
   });
 }
 

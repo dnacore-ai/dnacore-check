@@ -1,7 +1,7 @@
 {
   "name": "dnacore-check",
-  "version": "0.2.1",
-  "description": "Check your site's AI-readiness: validates llms.txt, agents.json, robots.txt and scores AI discoverability.",
+  "version": "0.3.4",
+  "description": "Check your site's AI-readiness: validates llms.txt, agents.json, robots.txt, and JSON-LD structured data. Score 0–100.",
   "main": "index.js",
   "bin": {
     "dnacore-check": "index.js"
@@ -23,7 +23,10 @@
     "ai-verification",
     "dnacore",
     "open-protocol",
-    "mcp"
+    "mcp",
+    "json-ld",
+    "structured-data",
+    "seo"
   ],
   "agents": {
     "skills": ["./SKILL.md"]

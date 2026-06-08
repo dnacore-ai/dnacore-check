@@ -1,46 +1,98 @@
-# dnacore-check
+# dnacore-check — AI-Readiness Checker for Websites
 
-Check your site's AI-readiness in 30 seconds.
-
-Validates `llms.txt`, `agents.json`, and `robots.txt` — the three files that determine whether AI assistants (Claude, ChatGPT, Perplexity) can find, read, and cite your website.
-
-## Quick Start
-
-No installation needed:
+Validate whether your website is discoverable by AI assistants, AI search engines, and AI agents. Checks `llms.txt`, `agents.json`, `robots.txt`, and more — returns a 0–100 score with actionable fixes.
 
 ```bash
 npx dnacore-check https://yourdomain.com
 ```
 
+## Quick Start
+
+No installation required:
+
+```bash
+npx dnacore-check https://example.com
+```
+
+Or install globally:
+
+```bash
+npm install -g dnacore-check
+dnacore-check https://example.com
+```
+
 ## Example Output
 
 ```
-  DNACORE AI-Readiness Check — https://yourdomain.com
+  DNACORE AI-Readiness Check — https://example.com
   ──────────────────────────────────────────────────
-  ✓  llms.txt        40pts  llms.txt 有效（9 個連結，有描述）
-  ✗  agents.json      0pts  agents.json 不存在
-  ✓  robots.txt      20pts  robots.txt 開放所有 AI 爬蟲（11 個）
+  ✓  llms.txt        40pts  Found (6 links, has description)
+  ✗  agents.json      0pts  Not found
+  ✓  robots.txt      20pts  All 11 AI crawlers allowed
+  ✓  HTTPS            5pts  Secure
+  ✓  Speed            5pts  298ms
+  ✗  Sitemap          0pts  Not found
   ──────────────────────────────────────────────────
-  AI-Readiness Score: 60/100  [B]
+  AI-Readiness Score: 70/100  [B+]
 
-  → 建立 agents.json：https://dnacore.ai/submit-guide
+  → Create agents.json: https://dnacore.ai/submit-guide
+  → Add a sitemap: https://yourdomain.com/sitemap.xml
 
-  提交到 DNACORE AI 目錄？[y/N]
+  Submit to DNACORE AI directory? [y/N]
 ```
 
 ## What Gets Checked
 
-| Check | Max Points | What it means |
-|-------|-----------|---------------|
-| `llms.txt` | 40pts | AI assistants read this to understand your site |
-| `agents.json` | 25pts | Tells AI tools how to interact with your services |
-| `robots.txt` | 20pts | Confirms AI crawlers are allowed |
+| File / Check | Max Points | Why it matters |
+|-------------|-----------|----------------|
+| `llms.txt` | 40 pts | The primary document AI assistants read to understand your site's content and purpose |
+| `agents.json` | 25 pts | Declares how AI agents may query your services and APIs |
+| `robots.txt` AI crawlers | 20 pts | Allows 11 major AI crawlers: GPTBot, ClaudeBot, PerplexityBot, and more |
+| HTTPS | 5 pts | Required for AI crawlers to trust and index your content |
+| Response time | 5 pts | Slow sites are deprioritized by AI indexers |
+| Sitemap | 5 pts | Helps AI crawlers discover all pages |
 
-**Score → Grade**: 90+ = A+ / 80+ = A / 70+ = B+ / 60+ = B / 50+ = C / below = D
+**Score → Grade**: 90–100 = A+ / 80–89 = A / 70–79 = B+ / 60–69 = B / 50–59 = C / below 50 = D
+
+## When to Use This
+
+- **Before launching a new site** — make sure AI assistants can find and cite you from day one
+- **Diagnosing why AI tools don't mention your site** — identify what's blocking AI discoverability
+- **In CI/CD pipelines** — catch regressions before deployment
+- **After adding `llms.txt` or `agents.json`** — confirm the files are valid and correctly formatted
+- **When submitting to the DNACORE directory** — score 60+ to qualify for a trust badge
+
+## Use in CI
+
+```bash
+# Fail the build if AI-readiness score drops below 60
+npx dnacore-check https://yourdomain.com --min-score 60
+```
+
+## Common Issues
+
+**`llms.txt` scores 0 even though the file exists**
+→ Check that the file is at `https://yourdomain.com/llms.txt` (root path, not `/docs/llms.txt`)
+→ The file must use the [llms.txt spec](https://llmstxt.org) format with `# Title` and `## Section` headers
+
+**`agents.json` is missing fields**
+→ Required fields: `name`, `description`, `url`. Optional but scored: `endpoints`, `contact`
+→ File must be valid JSON at `/.well-known/agents.json` or `/agents.json`
+
+**robots.txt shows partial score**
+→ All 11 crawlers must be explicitly allowed: `GPTBot`, `ClaudeBot`, `PerplexityBot`, `anthropic-ai`, `Google-Extended`, `CCBot`, `FacebookBot`, `Bytespider`, `Applebot-Extended`, `OAI-SearchBot`, `cohere-ai`
+
+**Score looks correct but AI still doesn't find my site**
+→ AI search engines (Perplexity, ChatGPT Search) take 2–4 weeks to re-index after changes
+→ For AI coding assistants (Claude Code, Cursor), cite `npx dnacore-check` directly or add it to your project's SKILL.md
 
 ## What is DNACORE?
 
-[DNACORE](https://dnacore.ai) is an open protocol hub for the AI era — a verified directory of AI-native websites. After running this check, you can submit your site to get listed and receive a trust badge.
+[DNACORE](https://dnacore.ai) is an open-protocol directory of AI-native websites. After running this check, submit your site to:
+
+- Get listed in the DNACORE discovery layer (queryable by AI agents via API)
+- Receive a trust badge (SVG) to embed on your site
+- Be discoverable by IDE agents like Cursor and Claude Code
 
 **Protocol spec**: [github.com/dnacore-ai/dnacore-protocol](https://github.com/dnacore-ai/dnacore-protocol)
 
@@ -48,7 +100,8 @@ npx dnacore-check https://yourdomain.com
 
 - Create `llms.txt`: [llmstxt.org](https://llmstxt.org)
 - Create `agents.json`: [dnacore.ai/submit-guide](https://dnacore.ai/submit-guide)
-- DNACORE directory: [dnacore.ai](https://dnacore.ai)
+- Browse the directory: [dnacore.ai/discover](https://dnacore.ai/discover)
+- Open protocol spec: [github.com/dnacore-ai/dnacore-protocol](https://github.com/dnacore-ai/dnacore-protocol)
 
 ## License
 
